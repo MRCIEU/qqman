@@ -178,21 +178,23 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, opts: &ManhattanOptio
     dev.par.xaxs = AxisStyle::Exact;
     dev.par.yaxs = AxisStyle::Exact;
     dev.plot_new();
-    dev.plot_window(d.xlim, d.ylim, &PlotWindowOptions::default());
-    dev.axis(2, &AxisOptions::default().las(1));
-    dev.title(&TitleOptions {
-        main: c.main.as_deref().map(Label::from),
-        xlab: Some(d.xlabel.as_str().into()),
-        ylab: Some(Label::math("-log[10](italic(p))")),
-        ..TitleOptions::default()
-    });
+    dev.plot_window(d.xlim, d.ylim).draw();
+    dev.axis(2).las(1).draw();
+    dev.title()
+        .with(&TitleOptions {
+            main: c.main.as_deref().map(Label::from),
+            xlab: Some(d.xlabel.as_str().into()),
+            ylab: Some(Label::math("-log[10](italic(p))")),
+            ..TitleOptions::default()
+        })
+        .draw();
 
     // qqman forwards `cex` to axis(1, ...) too, but C_axis() sizes labels
     // from cex.axis alone, so it has no effect there.
     if d.groups.len() == 1 {
-        dev.axis(1, &AxisOptions::default());
+        dev.axis(1).draw();
     } else {
-        dev.axis(1, &AxisOptions::default().at(&d.ticks).labels(&d.labs));
+        dev.axis(1).at(&d.ticks).labels(&d.labs).draw();
     }
 
     let palette = dev.par.palette.clone();
@@ -214,10 +216,10 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, opts: &ManhattanOptio
     }
 
     if let Some(h) = opts.suggestiveline.filter(|&h| h != 0.0) {
-        dev.abline(&AblineOptions::default().h(h).col("blue"));
+        dev.abline().h(h).col("blue").draw();
     }
     if let Some(h) = opts.genomewideline.filter(|&h| h != 0.0) {
-        dev.abline(&AblineOptions::default().h(h).col("red"));
+        dev.abline().h(h).col("red").draw();
     }
 
     if let (Some(highlight), Some(snp)) = (&opts.highlight, &d.snp) {
@@ -282,7 +284,7 @@ fn annotate<B: Backend>(
         let xc = if x >= 0.0 { 0.5 - offset } else { 0.5 + offset };
         let yc = if y >= 0.0 { 0.5 - offset } else { 0.5 + offset };
         let label = TextOptions::default().adj(xc).vadj(yc).cex(cex).xpd(true);
-        dev.text(&[x], &[y], &[snp[i].as_str()], &label);
+        dev.text(&[x], &[y], &[snp[i].as_str()]).with(&label).draw();
     }
 }
 

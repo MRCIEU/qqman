@@ -39,7 +39,7 @@ pub fn prepare(mut p: Vec<f64>, common: &Common) -> Result<Prepared> {
 pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, common: &Common) {
     // plot(e, o, pch = 20, ...): points, then axes, box and titles.
     dev.plot_new();
-    dev.plot_window(d.xlim, d.ylim, &PlotWindowOptions::default());
+    dev.plot_window(d.xlim, d.ylim).draw();
     draw::points_dedup(
         dev,
         &d.expected,
@@ -48,17 +48,19 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, common: &Common) {
         common.cex,
         common.dedup_grid,
     );
-    dev.axis(1, &AxisOptions::default());
-    dev.axis(2, &AxisOptions::default());
-    dev.box_(&BoxOptions::default());
-    dev.title(&TitleOptions {
-        main: common.main.as_deref().map(Label::from),
-        xlab: Some(Label::math("Expected ~ ~-log[10](italic(p))")),
-        ylab: Some(Label::math("Observed ~ ~-log[10](italic(p))")),
-        ..TitleOptions::default()
-    });
+    dev.axis(1).draw();
+    dev.axis(2).draw();
+    dev.box_().draw();
+    dev.title()
+        .with(&TitleOptions {
+            main: common.main.as_deref().map(Label::from),
+            xlab: Some(Label::math("Expected ~ ~-log[10](italic(p))")),
+            ylab: Some(Label::math("Observed ~ ~-log[10](italic(p))")),
+            ..TitleOptions::default()
+        })
+        .draw();
     // abline(0, 1, col = "red")
-    dev.abline(&AblineOptions::default().coef(0.0, 1.0).col("red"));
+    dev.abline().coef(0.0, 1.0).col("red").draw();
 }
 
 #[cfg(test)]
