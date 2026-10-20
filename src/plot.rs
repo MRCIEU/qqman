@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{Context, Result, anyhow};
 use rs_graphics::prelude::*;
 
 /// The subset of R's `...` graphical arguments the CLI exposes.
@@ -55,9 +55,14 @@ pub fn resolve_color(spec: ColorSpec, palette: &[Color]) -> Color {
     spec.resolve(palette).unwrap_or(Color::TRANSPARENT)
 }
 
-/// Parses an R colour: a name, `#RRGGBB[AA]`, or a palette index.
-pub fn parse_color(s: &str) -> Result<ColorSpec> {
+/// Parses an R colour: a name, `#RRGGBB[AA]`, or a palette index (>= 0,
+/// as in R). Used as a clap `value_parser`, so a bad `--col` fails before
+/// the input is read.
+pub fn parse_color(s: &str) -> std::result::Result<ColorSpec, String> {
     if let Ok(i) = s.parse::<i32>() {
+        if i < 0 {
+            return Err(format!("numerical color values must be >= 0, found {i}"));
+        }
         return Ok(ColorSpec::Index(i));
     }
     match Color::parse(s) {
@@ -65,7 +70,7 @@ pub fn parse_color(s: &str) -> Result<ColorSpec> {
         None if s.eq_ignore_ascii_case("NA") || s.eq_ignore_ascii_case("transparent") => {
             Ok(ColorSpec::None)
         }
-        None => bail!("invalid color name '{s}'"),
+        None => Err(format!("invalid color name '{s}'")),
     }
 }
 
@@ -76,20 +81,49 @@ pub trait Figure {
 
 /// Writes `fig` to `out`, choosing the format from the file extension.
 pub fn save<F: Figure>(fig: &F, out: &Path, c: &Common) -> Result<()> {
-    let backend = AnyBackend::for_path(out, c.width, c.height, c.dpi).map_err(|_| {
-        anyhow!(
-            "can't tell output format from {}: use .png, .pdf or .svg",
-            out.display()
-        )
-    })?;
-    let par = Par {
-        ps: c.pointsize,
-        cex_axis: c.cex_axis,
-        cex_lab: c.cex_lab,
-        ..Par::default()
-    };
-    let mut dev = Device::new(backend, par);
+    let format = out
+        .extension()
+        .and_then(|e| e.to_str())
+        .and_then(Format::parse)
+        .ok_or_else(|| {
+            anyhow!(
+                "can't tell output format from {}: use .png, .pdf or .svg",
+                out.display()
+            )
+        })?;
+    let mut dev = Device::format(format, out)
+        .width(c.width)
+        .height(c.height)
+        .res(c.dpi)
+        .pointsize(c.pointsize)
+        .open()?;
+    dev.par().cex_axis(c.cex_axis).cex_lab(c.cex_lab).draw();
     fig.draw(&mut dev);
-    dev.save(out)
+    dev.close()
         .with_context(|| format!("cannot write {}", out.display()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_color_follows_r() {
+        assert_eq!(parse_color("2"), Ok(ColorSpec::Index(2)));
+        assert_eq!(parse_color("0"), Ok(ColorSpec::Index(0)));
+        // R ignores spaces in colour names.
+        assert_eq!(
+            parse_color("light blue"),
+            Ok(ColorSpec::Color(Color::rgb(173, 216, 230)))
+        );
+        assert_eq!(parse_color("NA"), Ok(ColorSpec::None));
+        assert_eq!(
+            parse_color("-1"),
+            Err("numerical color values must be >= 0, found -1".to_string())
+        );
+        assert_eq!(
+            parse_color("notacolour"),
+            Err("invalid color name 'notacolour'".to_string())
+        );
+    }
 }

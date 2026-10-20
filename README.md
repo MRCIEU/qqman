@@ -109,7 +109,7 @@ Options:
       --snp <SNP>
           SNP name column (needed for --highlight and --annotate-pval) [default: SNP]
       --col <COL>
-          Colours to cycle through by chromosome [default: gray10,gray60]
+          Colours to cycle through by chromosome: names, `#RRGGBB[AA]` or palette numbers (>= 0) [default: gray10,gray60]
       --chrlabs <CHRLABS>
           Chromosome labels, one per chromosome, comma-separated
       --suggestiveline <SUGGESTIVELINE>

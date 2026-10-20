@@ -16,6 +16,7 @@ use std::time::Instant;
 use anyhow::{Context, Result};
 use clap::{Args, CommandFactory, Parser, Subcommand};
 use rs_graphics::backend::Backend;
+use rs_graphics::color::ColorSpec;
 use rs_graphics::device::Device;
 
 use input::{ColKind, ColSpec, read_columns};
@@ -128,9 +129,16 @@ struct ManhattanArgs {
     /// SNP name column (needed for --highlight and --annotate-pval).
     #[arg(long, default_value = "SNP")]
     snp: String,
-    /// Colours to cycle through by chromosome.
-    #[arg(long, value_delimiter = ',', default_value = "gray10,gray60")]
-    col: Vec<String>,
+    /// Colours to cycle through by chromosome: names, `#RRGGBB[AA]` or
+    /// palette numbers (>= 0).
+    #[arg(
+        long,
+        value_delimiter = ',',
+        value_parser = parse_color,
+        allow_hyphen_values = true,
+        default_value = "gray10,gray60"
+    )]
+    col: Vec<ColorSpec>,
     /// Chromosome labels, one per chromosome, comma-separated.
     #[arg(long, value_delimiter = ',')]
     chrlabs: Option<Vec<String>>,
@@ -258,11 +266,7 @@ fn run_manhattan(args: ManhattanArgs) -> Result<()> {
     eprintln!("read {} rows in {:.2?}", chr.len(), t.elapsed());
 
     let opts = manhattan::ManhattanOptions {
-        col: args
-            .col
-            .iter()
-            .map(|c| parse_color(c))
-            .collect::<Result<_>>()?,
+        col: args.col,
         chrlabs: args.chrlabs,
         suggestiveline: args.suggestiveline.0,
         genomewideline: args.genomewideline.0,
@@ -346,5 +350,19 @@ mod tests {
         assert!(summary.starts_with("qqman-rs is licensed under the GNU General Public License"));
         assert!(!summary.contains("---"));
         assert!(summary.len() < NOTICE.len());
+    }
+
+    #[test]
+    fn negative_col_is_rejected_while_parsing_arguments() {
+        let parse = |col: &str| {
+            Cli::try_parse_from(["qqman", "manhattan", "in.tsv", "-o", "out.png", "--col", col])
+        };
+        let err = parse("1,-2").err().expect("a negative colour is an error");
+        assert!(
+            err.to_string()
+                .contains("numerical color values must be >= 0, found -2"),
+            "{err}"
+        );
+        assert!(parse("1,2").is_ok());
     }
 }
