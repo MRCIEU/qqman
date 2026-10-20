@@ -15,7 +15,7 @@ path = "src/main.rs"
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 flate2 = "1"
-rs-graphics = { git = "ssh://git@github.com/MRCIEU/rs-graphics.git", rev = "f3727f6132ba5efb01ab4ff6cdad061d7d22501e", version = "0.1.0-pre" }
+rs-graphics = { git = "ssh://git@github.com/MRCIEU/rs-graphics.git", rev = "97a341ea8fc86e22fddf96cab8011c044280bff8", version = "0.1.0-pre" }
 
 [profile.release]
 lto = true

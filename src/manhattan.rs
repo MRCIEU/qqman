@@ -175,8 +175,7 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, opts: &ManhattanOptio
     let c = &opts.common;
 
     // plot(NA, xaxt = "n", bty = "n", xaxs = "i", yaxs = "i", las = 1, ...)
-    dev.par.xaxs = AxisStyle::Exact;
-    dev.par.yaxs = AxisStyle::Exact;
+    dev.par().xaxs(AxisStyle::Exact).yaxs(AxisStyle::Exact).draw();
     dev.plot_new();
     dev.plot_window(d.xlim, d.ylim).draw();
     dev.axis(2).las(1).draw();
@@ -197,7 +196,7 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, opts: &ManhattanOptio
         dev.axis(1).at(&d.ticks).labels(&d.labs).draw();
     }
 
-    let palette = dev.par.palette.clone();
+    let palette = dev.current_par().palette.clone();
     let cols: Vec<Color> = opts
         .col
         .iter()
