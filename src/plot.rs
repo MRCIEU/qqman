@@ -166,7 +166,7 @@ mod tests {
 
     impl Figure for Points {
         fn draw<B: Backend>(&self, dev: &mut Device<B>) {
-            dev.plot(&[1, 2], &[1, 2]).draw();
+            dev.plot().x(&[1, 2]).y(&[1, 2]).draw();
         }
     }
 

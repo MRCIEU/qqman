@@ -26,5 +26,5 @@ pub fn points_dedup<B: Backend>(
             seen.insert(((p.x * grid).round() as i64, (p.y * grid).round() as i64))
         })
         .unzip();
-    dev.points(&xs, &ys).pch(20).col(col).cex(cex).draw();
+    dev.points().x(&xs).y(&ys).pch(20).col(col).cex(cex).draw();
 }

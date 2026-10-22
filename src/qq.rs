@@ -39,7 +39,10 @@ pub fn prepare(mut p: Vec<f64>, common: &Common) -> Result<Prepared> {
 pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, common: &Common) {
     // plot(e, o, pch = 20, ...): points, then axes, box and titles.
     dev.plot_new();
-    dev.plot_window(d.xlim, d.ylim).draw();
+    dev.plot_window()
+        .xlim(d.xlim.0, d.xlim.1)
+        .ylim(d.ylim.0, d.ylim.1)
+        .draw();
     draw::points_dedup(
         dev,
         &d.expected,
@@ -48,8 +51,8 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, common: &Common) {
         common.cex,
         common.dedup_grid,
     );
-    dev.axis(1).draw();
-    dev.axis(2).draw();
+    dev.axis().side(1).draw();
+    dev.axis().side(2).draw();
     dev.box_().draw();
     dev.title()
         .with(&TitleOptions {
@@ -60,7 +63,7 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, common: &Common) {
         })
         .draw();
     // abline(0, 1, col = "red")
-    dev.abline().coef(0.0, 1.0).col("red").draw();
+    dev.abline().a(0.0).b(1.0).col("red").draw();
 }
 
 #[cfg(test)]

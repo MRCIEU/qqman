@@ -177,8 +177,11 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, opts: &ManhattanOptio
     // plot(NA, xaxt = "n", bty = "n", xaxs = "i", yaxs = "i", las = 1, ...)
     dev.par().xaxs(AxisStyle::Exact).yaxs(AxisStyle::Exact).draw();
     dev.plot_new();
-    dev.plot_window(d.xlim, d.ylim).draw();
-    dev.axis(2).las(1).draw();
+    dev.plot_window()
+        .xlim(d.xlim.0, d.xlim.1)
+        .ylim(d.ylim.0, d.ylim.1)
+        .draw();
+    dev.axis().side(2).las(1).draw();
     dev.title()
         .with(&TitleOptions {
             main: c.main.as_deref().map(Label::from),
@@ -191,9 +194,9 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, opts: &ManhattanOptio
     // qqman forwards `cex` to axis(1, ...) too, but C_axis() sizes labels
     // from cex.axis alone, so it has no effect there.
     if d.groups.len() == 1 {
-        dev.axis(1).draw();
+        dev.axis().side(1).draw();
     } else {
-        dev.axis(1).at(&d.ticks).labels(&d.labs).draw();
+        dev.axis().side(1).at(&d.ticks).labels(&d.labs).draw();
     }
 
     let palette = dev.current_par().palette.clone();
@@ -283,7 +286,12 @@ fn annotate<B: Backend>(
         let xc = if x >= 0.0 { 0.5 - offset } else { 0.5 + offset };
         let yc = if y >= 0.0 { 0.5 - offset } else { 0.5 + offset };
         let label = TextOptions::default().adj(xc).vadj(yc).cex(cex).xpd(true);
-        dev.text(&[x], &[y], &[snp[i].as_str()]).with(&label).draw();
+        dev.text()
+            .x(&[x])
+            .y(&[y])
+            .labels(&[snp[i].as_str()])
+            .with(&label)
+            .draw();
     }
 }
 
