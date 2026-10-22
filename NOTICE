@@ -30,6 +30,7 @@ Copyright (C) 1995-2026 The R Core Team
 Copyright (C) 2002-2016 The R Foundation
 Copyright (C) 1995-1997 Robert Gentleman and Ross Ihaka
 Copyright (C) 1997-1998 Paul Murrell and Ross Ihaka
+Copyright (C) 2001 Kevin Buhr (polygon hatching, src/library/graphics/R/polygon.R)
 
 R is free software; you can redistribute it and/or modify it under the terms
 of the GNU General Public License as published by the Free Software
@@ -44,7 +45,7 @@ src/main/{engine,plotmath,graphics,plot,format,util}.c, src/appl/pretty.c,
 src/library/grDevices/src/{devPS,colors}.c,
 src/library/grDevices/inst/enc/ISOLatin1.enc, and the R functions in
 src/library/graphics/R/ (plot.default, hist, barplot, boxplot, bxp, pie,
-legend, ...), src/library/grDevices/R/ (boxplot.stats, nclass.Sturges,
+legend, polygon, rect, ...), src/library/grDevices/R/ (boxplot.stats, nclass.Sturges,
 gray.colors, xy.coords), src/library/base/R/pretty.R and
 src/library/stats/R/fivenum.R.
 
