@@ -1,9 +1,6 @@
 //! Options shared by both plots, and writing a figure to SVG/PDF/PNG.
 
-use std::any::Any;
-use std::panic::{self, AssertUnwindSafe};
 use std::path::Path;
-use std::sync::Arc;
 
 use anyhow::{Context, Result, anyhow};
 use rs_graphics::prelude::*;
@@ -77,52 +74,10 @@ pub fn parse_color(s: &str) -> std::result::Result<ColorSpec, String> {
     }
 }
 
-/// A plot that can be drawn onto any backend.
+/// A plot that can be drawn onto any backend. Fails with rs-graphics'
+/// error where R would stop (a page too small for the margins).
 pub trait Figure {
-    fn draw<B: Backend>(&self, dev: &mut Device<B>);
-}
-
-/// R's errors for a page too small for its margins, which rs-graphics'
-/// `plot_new()` raises as panics.
-const REGION_ERRORS: [&str; 4] = [
-    "outer margins too large (figure region too small)",
-    "figure region too large",
-    "figure margins too large",
-    "plot region too large",
-];
-
-/// The region error a panic carries, if it is one.
-fn region_error(payload: &(dyn Any + Send)) -> Option<&'static str> {
-    let msg = payload
-        .downcast_ref::<String>()
-        .map(String::as_str)
-        .or_else(|| payload.downcast_ref::<&str>().copied())?;
-    REGION_ERRORS.into_iter().find(|&e| e == msg)
-}
-
-/// Runs `f`, turning a region-error panic into that message (printing
-/// nothing for it); other panics go to the previous hook and carry on.
-fn catch_region_error(f: impl FnOnce()) -> std::result::Result<(), &'static str> {
-    let prev = Arc::new(panic::take_hook());
-    let hook = Arc::clone(&prev);
-    panic::set_hook(Box::new(move |info| {
-        if region_error(info.payload()).is_none() {
-            hook(info);
-        }
-    }));
-    let result = panic::catch_unwind(AssertUnwindSafe(f));
-    // Dropping our hook releases its copy of the previous one.
-    drop(panic::take_hook());
-    if let Ok(prev) = Arc::try_unwrap(prev) {
-        panic::set_hook(prev);
-    }
-    match result {
-        Ok(()) => Ok(()),
-        Err(payload) => match region_error(&*payload) {
-            Some(msg) => Err(msg),
-            None => panic::resume_unwind(payload),
-        },
-    }
+    fn draw<B: Backend>(&self, dev: &mut Device<B>) -> std::result::Result<(), rs_graphics::Error>;
 }
 
 /// Writes `fig` to `out`, choosing the format from the file extension.
@@ -146,13 +101,17 @@ pub fn save<F: Figure>(fig: &F, out: &Path, c: &Common) -> Result<()> {
         .pointsize(c.pointsize)
         .open()?;
     dev.par().cex_axis(c.cex_axis).cex_lab(c.cex_lab).draw();
-    if let Err(msg) = catch_region_error(|| fig.draw(&mut dev)) {
+    if let Err(e) = fig.draw(&mut dev) {
         // `open()` created the file; nothing usable will be written to it.
         drop(dev);
         let _ = std::fs::remove_file(out);
-        return Err(anyhow!(
-            "{msg}: use a larger --width/--height or a smaller --pointsize"
-        ));
+        if e.kind() == ErrorKind::DoesNotFit {
+            return Err(anyhow!(
+                "{}: use a larger --width/--height or a smaller --pointsize",
+                e.message()
+            ));
+        }
+        return Err(e.into());
     }
     dev.close()
         .with_context(|| format!("cannot write {}", out.display()))
@@ -165,8 +124,11 @@ mod tests {
     struct Points;
 
     impl Figure for Points {
-        fn draw<B: Backend>(&self, dev: &mut Device<B>) {
-            dev.plot().x(&[1, 2]).y(&[1, 2]).draw();
+        fn draw<B: Backend>(
+            &self,
+            dev: &mut Device<B>,
+        ) -> std::result::Result<(), rs_graphics::Error> {
+            dev.plot().x(&[1, 2]).y(&[1, 2]).try_draw()
         }
     }
 
@@ -183,11 +145,9 @@ mod tests {
         let err = save(&Points, &out, &small).unwrap_err().to_string();
         assert!(err.starts_with("figure margins too large: "), "{err}");
         assert!(!out.exists());
-        // The default size works, and other panics are not caught.
+        // The default size works.
         save(&Points, &out, &Common::default()).unwrap();
         assert!(out.exists());
-        let other = panic::catch_unwind(|| catch_region_error(|| panic!("something else")));
-        assert!(other.is_err());
         std::fs::remove_dir_all(&dir).unwrap();
     }
 

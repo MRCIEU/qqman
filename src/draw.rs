@@ -22,7 +22,7 @@ pub fn points_dedup<B: Backend>(
         .zip(ys)
         .filter(|(x, y)| x.is_finite() && y.is_finite())
         .filter(|&(&x, &y)| {
-            let p = dev.user_to_inches(x, y);
+            let p = dev.user_to_inches(Point::new(x, y));
             seen.insert(((p.x * grid).round() as i64, (p.y * grid).round() as i64))
         })
         .unzip();

@@ -36,9 +36,14 @@ pub fn prepare(mut p: Vec<f64>, common: &Common) -> Result<Prepared> {
     })
 }
 
-pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, common: &Common) {
+/// Fails where R would stop: a page too small for the margins.
+pub fn draw<B: Backend>(
+    dev: &mut Device<B>,
+    d: &Prepared,
+    common: &Common,
+) -> Result<(), rs_graphics::Error> {
     // plot(e, o, pch = 20, ...): points, then axes, box and titles.
-    dev.plot_new();
+    dev.try_plot_new()?;
     dev.plot_window()
         .xlim(d.xlim.0, d.xlim.1)
         .ylim(d.ylim.0, d.ylim.1)
@@ -64,6 +69,7 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, common: &Common) {
         .draw();
     // abline(0, 1, col = "red")
     dev.abline().a(0.0).b(1.0).col("red").draw();
+    Ok(())
 }
 
 #[cfg(test)]

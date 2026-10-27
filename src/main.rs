@@ -207,16 +207,16 @@ fn parse_line(s: &str) -> Result<Line, String> {
 struct ManhattanFigure(manhattan::Prepared, manhattan::ManhattanOptions);
 
 impl Figure for ManhattanFigure {
-    fn draw<B: Backend>(&self, dev: &mut Device<B>) {
-        manhattan::draw(dev, &self.0, &self.1);
+    fn draw<B: Backend>(&self, dev: &mut Device<B>) -> Result<(), rs_graphics::Error> {
+        manhattan::draw(dev, &self.0, &self.1)
     }
 }
 
 struct QqFigure(qq::Prepared, Common);
 
 impl Figure for QqFigure {
-    fn draw<B: Backend>(&self, dev: &mut Device<B>) {
-        qq::draw(dev, &self.0, &self.1);
+    fn draw<B: Backend>(&self, dev: &mut Device<B>) -> Result<(), rs_graphics::Error> {
+        qq::draw(dev, &self.0, &self.1)
     }
 }
 

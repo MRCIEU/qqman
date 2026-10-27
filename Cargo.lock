@@ -281,8 +281,8 @@ dependencies = [
 
 [[package]]
 name = "rs-graphics"
-version = "0.3.0"
-source = "git+ssh://git@github.com/MRCIEU/rs-graphics.git?tag=v0.3.0#7856bd86897cc30c3ce78d559545d70f6484da15"
+version = "0.4.0"
+source = "git+ssh://git@github.com/MRCIEU/rs-graphics.git?tag=v0.4.0#cacc2cb074ae0a3a1566c26ecbf8abf2d3f75c29"
 dependencies = [
  "ab_glyph",
  "adler2",

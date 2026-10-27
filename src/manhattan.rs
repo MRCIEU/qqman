@@ -171,12 +171,17 @@ pub fn prepare(input: ManhattanInput, opts: &ManhattanOptions) -> Result<Prepare
     })
 }
 
-pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, opts: &ManhattanOptions) {
+/// Fails where R would stop: a page too small for the margins.
+pub fn draw<B: Backend>(
+    dev: &mut Device<B>,
+    d: &Prepared,
+    opts: &ManhattanOptions,
+) -> Result<(), rs_graphics::Error> {
     let c = &opts.common;
 
     // plot(NA, xaxt = "n", bty = "n", xaxs = "i", yaxs = "i", las = 1, ...)
     dev.par().xaxs(AxisStyle::Exact).yaxs(AxisStyle::Exact).draw();
-    dev.plot_new();
+    dev.try_plot_new()?;
     dev.plot_window()
         .xlim(d.xlim.0, d.xlim.1)
         .ylim(d.ylim.0, d.ylim.1)
@@ -245,6 +250,7 @@ pub fn draw<B: Backend>(dev: &mut Device<B>, d: &Prepared, opts: &ManhattanOptio
     if let Some(threshold) = opts.annotate_pval {
         annotate(dev, d, opts, threshold);
     }
+    Ok(())
 }
 
 /// The `annotatePval` block, including `calibrate::textxy()`.
