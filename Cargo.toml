@@ -1,11 +1,11 @@
 [package]
-name = "qqman-rs"
+name = "qqman"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Manhattan and Q-Q plots for GWAS results: a Rust port of the R package qqman."
 license = "GPL-3.0-only"
-repository = "https://github.com/MRCIEU/qqman-rs"
+repository = "https://github.com/MRCIEU/qqman"
 
 [[bin]]
 name = "qqman"
