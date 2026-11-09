@@ -18,8 +18,8 @@ cargo install --git ssh://git@github.com/MRCIEU/qqman.git
 ```
 
 This puts the `qqman` binary in Cargo's bin directory (usually
-`~/.cargo/bin`). The repositories are fetched over SSH, so you need a GitHub
-SSH key with access to them. If Cargo can't authenticate, set
+`~/.cargo/bin`). The repository is fetched over SSH, so you need a GitHub
+SSH key with access to it. If Cargo can't authenticate, set
 `CARGO_NET_GIT_FETCH_WITH_CLI=true` so it uses your system `git`.
 
 To build from a clone instead:
@@ -28,6 +28,14 @@ To build from a clone instead:
 git clone git@github.com:MRCIEU/qqman.git
 cd qqman
 cargo build --release   # binary at target/release/qqman
+```
+
+Or build a Docker image (about 2 MB, with no R inside):
+
+```
+docker build -t qqman .
+docker run --rm qqman    # prints qqman --help
+docker run --rm -v "$PWD:/data" -w /data qqman qqman manhattan results.tsv -o manhattan.png
 ```
 
 ## Usage
