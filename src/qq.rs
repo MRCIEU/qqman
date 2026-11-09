@@ -45,8 +45,8 @@ pub fn draw<B: Backend>(
     // plot(e, o, pch = 20, ...): points, then axes, box and titles.
     dev.try_plot_new()?;
     dev.plot_window()
-        .xlim(d.xlim.0, d.xlim.1)
-        .ylim(d.ylim.0, d.ylim.1)
+        .xlim(d.xlim)
+        .ylim(d.ylim)
         .draw();
     draw::points_dedup(
         dev,
@@ -60,12 +60,9 @@ pub fn draw<B: Backend>(
     dev.axis().side(2).draw();
     dev.box_().draw();
     dev.title()
-        .with(&TitleOptions {
-            main: common.main.as_deref().map(Label::from),
-            xlab: Some(Label::math("Expected ~ ~-log[10](italic(p))")),
-            ylab: Some(Label::math("Observed ~ ~-log[10](italic(p))")),
-            ..TitleOptions::default()
-        })
+        .main(common.main.as_deref())
+        .xlab(Label::math("Expected ~ ~-log[10](italic(p))"))
+        .ylab(Label::math("Observed ~ ~-log[10](italic(p))"))
         .draw();
     // abline(0, 1, col = "red")
     dev.abline().a(0.0).b(1.0).col("red").draw();

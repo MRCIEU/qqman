@@ -183,17 +183,14 @@ pub fn draw<B: Backend>(
     dev.par().xaxs(AxisStyle::Exact).yaxs(AxisStyle::Exact).draw();
     dev.try_plot_new()?;
     dev.plot_window()
-        .xlim(d.xlim.0, d.xlim.1)
-        .ylim(d.ylim.0, d.ylim.1)
+        .xlim(d.xlim)
+        .ylim(d.ylim)
         .draw();
     dev.axis().side(2).las(1).draw();
     dev.title()
-        .with(&TitleOptions {
-            main: c.main.as_deref().map(Label::from),
-            xlab: Some(d.xlabel.as_str().into()),
-            ylab: Some(Label::math("-log[10](italic(p))")),
-            ..TitleOptions::default()
-        })
+        .main(c.main.as_deref())
+        .xlab(d.xlabel.as_str())
+        .ylab(Label::math("-log[10](italic(p))"))
         .draw();
 
     // qqman forwards `cex` to axis(1, ...) too, but C_axis() sizes labels
@@ -241,7 +238,7 @@ pub fn draw<B: Backend>(
             dev,
             &xs,
             &ys,
-            Color::parse("green3").unwrap(),
+            "green3".parse::<Color>().unwrap(),
             c.cex,
             c.dedup_grid,
         );

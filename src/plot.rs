@@ -65,7 +65,7 @@ pub fn parse_color(s: &str) -> std::result::Result<ColorSpec, String> {
         }
         return Ok(ColorSpec::Index(i));
     }
-    match Color::parse(s) {
+    match s.parse::<Color>().ok() {
         Some(c) => Ok(ColorSpec::Color(c)),
         None if s.eq_ignore_ascii_case("NA") || s.eq_ignore_ascii_case("transparent") => {
             Ok(ColorSpec::None)
@@ -87,7 +87,7 @@ pub fn save<F: Figure>(fig: &F, out: &Path, c: &Common) -> Result<()> {
     let format = out
         .extension()
         .and_then(|e| e.to_str())
-        .and_then(Format::parse)
+        .and_then(|e| e.parse::<Format>().ok())
         .ok_or_else(|| {
             anyhow!(
                 "can't tell output format from {}: use .png, .pdf or .svg",
