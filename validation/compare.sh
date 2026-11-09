@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Renders the cases in reference.R with qqman-rs, as PDF and PNG, and compares
-# each against R/qqman's output pixel by pixel.
+# Renders the cases in reference.R with qqman (this Rust port), as PDF and PNG,
+# and compares each against R/qqman's output pixel by pixel.
 #
 #   validation/compare.sh                 # compare against existing reference/
 #   validation/compare.sh --reference     # rerun reference.R first (needs R + qqman)
@@ -212,7 +212,7 @@ for name, r_path, rs_path in zip(args[0::3], args[1::3], args[2::3]):
     w, h, a = load(r_path)
     w2, h2, b = load(rs_path)
     if (w, h) != (w2, h2):
-        print(f"{name:<26}  size differs: R {w}x{h}, qqman-rs {w2}x{h2}")
+        print(f"{name:<26}  size differs: R {w}x{h}, Rust {w2}x{h2}")
         failed = True
         continue
     n = (tolerant_count if is_png else plain_count)(a, b, w, h, threshold)

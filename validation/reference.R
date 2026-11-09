@@ -1,5 +1,5 @@
 # Exports qqman's example data and renders reference plots with real R/qqman,
-# for side-by-side comparison with qqman-rs output.
+# for side-by-side comparison with output from qqman (the Rust port).
 #
 #   Rscript validation/reference.R     # -> validation/data/*, validation/reference/*.{pdf,png}
 #
@@ -24,7 +24,7 @@ plots <- list(
   qq = function() qq(gwasResults$P)
 )
 for (name in names(plots)) {
-  # qqman-rs's default sizes: manhattan 14 x 7 in, qq 7 x 7 in; PNGs at 150 dpi.
+  # The Rust port's default sizes: manhattan 14 x 7 in, qq 7 x 7 in; PNGs at 150 dpi.
   width <- if (startsWith(name, "manhattan")) 14 else 7
   pdf(file.path(here, "reference", paste0(name, ".pdf")), width = width, height = 7)
   plots[[name]]()

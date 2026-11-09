@@ -1,4 +1,4 @@
-qqman-rs is licensed under the GNU General Public License, version 3; see
+qqman is licensed under the GNU General Public License, version 3; see
 LICENSE. It is a port of the R package qqman by Stephen Turner
 (https://github.com/stephenturner/qqman), which is distributed under the same
 licence. It uses rs-graphics, which is licensed under the GNU General Public
@@ -6,7 +6,7 @@ License, version 3 or (at your option) any later version, to draw plots.
 rs-graphics is a modified version of parts of R (https://www.r-project.org);
 R's copyright notices are below.
 
-qqman-rs also embeds font metrics and font files (through rs-graphics), and
+qqman also embeds font metrics and font files (through rs-graphics), and
 incorporates third-party Rust crates, which are distributed under the
 following licences:
 
@@ -18,7 +18,7 @@ following licences:
   - BSD 2-Clause "Simplified" License
   - Unicode License v3
 
-Their copyright and licence notices are reproduced in full in the qqman-rs
+Their copyright and licence notices are reproduced in full in the qqman
 NOTICE file, as those licences require.
 
 --------------------------------------------------------------------------------

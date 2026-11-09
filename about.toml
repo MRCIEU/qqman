@@ -1,4 +1,4 @@
-# Licences acceptable for dependencies of qqman-rs. Where a crate offers a
+# Licences acceptable for dependencies of qqman. Where a crate offers a
 # choice (e.g. "MIT OR Apache-2.0"), the licence listed first here is used.
 accepted = [
     "MIT",
@@ -11,7 +11,7 @@ accepted = [
     "GPL-3.0-or-later",
 ]
 
-# Platforms qqman-rs is built for (the Docker image uses musl), so that
+# Platforms qqman is built for (the Docker image uses musl), so that
 # platform-specific dependencies for other targets (e.g. Windows) are left out
 targets = [
     "x86_64-unknown-linux-musl",

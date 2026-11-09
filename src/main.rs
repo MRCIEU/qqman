@@ -347,7 +347,7 @@ mod tests {
     #[test]
     fn test_notice_summary_stops_before_first_third_party_notice() {
         let summary = get_notice_summary();
-        assert!(summary.starts_with("qqman-rs is licensed under the GNU General Public License"));
+        assert!(summary.starts_with("qqman is licensed under the GNU General Public License"));
         assert!(!summary.contains("---"));
         assert!(summary.len() < NOTICE.len());
     }

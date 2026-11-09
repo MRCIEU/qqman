@@ -1,4 +1,4 @@
-# qqman-rs
+# qqman
 
 `qqman` is a command-line tool for drawing Manhattan and Q-Q plots of GWAS
 results. It is a Rust port of the R package
