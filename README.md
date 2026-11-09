@@ -14,18 +14,18 @@ of 5 million SNPs takes about a second as a PNG, where R/qqman takes around
 Install the [Rust toolchain](https://www.rust-lang.org/tools/install), then:
 
 ```
-cargo install --git ssh://git@github.com/MRCIEU/qqman.git
+cargo install --git https://github.com/MRCIEU/qqman
 ```
 
 This puts the `qqman` binary in Cargo's bin directory (usually
-`~/.cargo/bin`). The repository is fetched over SSH, so you need a GitHub
-SSH key with access to it. If Cargo can't authenticate, set
-`CARGO_NET_GIT_FETCH_WITH_CLI=true` so it uses your system `git`.
+`~/.cargo/bin`). It builds the latest code on `main`; to install a release,
+add its tag, for example `--tag v0.1.0` (see
+[Releases](https://github.com/MRCIEU/qqman/releases)).
 
 To build from a clone instead:
 
 ```
-git clone git@github.com:MRCIEU/qqman.git
+git clone https://github.com/MRCIEU/qqman.git
 cd qqman
 cargo build --release   # binary at target/release/qqman
 ```
